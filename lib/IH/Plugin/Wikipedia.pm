@@ -3,6 +3,67 @@ package IH::Plugin::Wikipedia;
 use strict;
 use 5.008_005;
 our $VERSION = '0.01';
+use Moose;
+use IH::Schema::Mongo::Trigger;
+use WWW::Google::AutoSuggest;
+use WWW::Wikipedia;
+
+extends 'IH::Plugin::Base';
+
+sub search {
+    my $self      = shift;
+    my $Said      = shift;
+    my $Phrase    = join( " ", @{ $Said->result } );
+    my $Wikipedia = WWW::Wikipedia->new(
+        language => $self->Config->DBConfiguration->{'language'} );
+    my $result = $Wikipedia->search($Phrase);
+    if ( $result->text ) {
+        $self->Parser->Output->info( $result->text );    #needs strip
+    }
+    else {
+        my $Suggest = WWW::Google::AutoSuggest->new();
+        $result = $Wikipedia->search( $Suggest->search($Phrase)[0] );
+        if ( $result->text ) {
+            $self->Parser->Output->info( $result->text );    #needs strip
+        }
+        else {
+            $Wikipedia->search(
+                join( "\n",
+                    map { $_ = uc( substr( $_, 0, 1 ) ) . substr( $_, 1 ) }
+                        @{ $Said->result } )
+            );
+            $self->Parser->Output->info( $result->text ) if ( $result->text );
+
+        }
+
+    }
+
+}
+
+sub install {
+    my $self = shift;
+    $self->Parser->Backend->installPlugin(
+        {   trigger       => 'wikipedia\s+(.*?)',
+            plugin        => "Wikipedia",
+            plugin_method => "search"
+        }
+    );
+
+}
+
+sub remove {
+    my $self = shift;
+    $self->Parser->Backend->removePlugin(
+        {   trigger       => 'wikipedia\s+(.*?)',
+            plugin        => "Wikipedia",
+            plugin_method => "search"
+        }
+    );
+}
+
+sub update {
+
+}
 
 1;
 __END__
