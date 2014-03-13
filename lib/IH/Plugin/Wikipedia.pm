@@ -22,13 +22,13 @@ sub search {
     }
     else {
         my $Suggest = WWW::Google::AutoSuggest->new();
-        $result = $Wikipedia->search( $Suggest->search($Phrase)[0] );
+        $result = $Wikipedia->search( @{$Suggest->search($Phrase)}[0] );
         if ( $result->text ) {
             $self->Parser->Output->info( $result->text );    #needs strip
         }
         else {
             $Wikipedia->search(
-                join( "\n",
+                join( " ",
                     map { $_ = uc( substr( $_, 0, 1 ) ) . substr( $_, 1 ) }
                         @{ $Said->result } )
             );

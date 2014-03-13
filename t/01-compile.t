@@ -1,8 +1,7 @@
 use strict;
 use Test::More;
-use IH::Plugin::Wikipedia;
 
 # replace with the actual test
-ok 1;
+use_ok("IH::Plugin::Wikipedia");
 
 done_testing;
