@@ -1,7 +1,15 @@
-requires 'perl', '5.008005';
+requires 'IH::Plugin::Base';
+requires 'IH::Schema::Mongo::Trigger';
+requires 'Moose';
+requires 'WWW::Google::AutoSuggest';
+requires 'WWW::Wikipedia';
+requires 'perl', '5.008_005';
 
-# requires 'Some::Module', 'VERSION';
+on configure => sub {
+    requires 'Module::Build::Tiny', '0.034';
+    requires 'perl', '5.008005';
+};
 
 on test => sub {
-    requires 'Test::More', '0.88';
+    requires 'Test::More';
 };
