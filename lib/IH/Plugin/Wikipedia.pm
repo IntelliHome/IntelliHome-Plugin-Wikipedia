@@ -43,7 +43,7 @@ sub search {
 sub install {
     my $self = shift;
     $self->Parser->Backend->installPlugin(
-        {   trigger       => 'wikipedia\s+(.*?)',
+        {   regex       => 'wikipedia\s+(.*?)',
             plugin        => "Wikipedia",
             plugin_method => "search"
         }
@@ -54,7 +54,7 @@ sub install {
 sub remove {
     my $self = shift;
     $self->Parser->Backend->removePlugin(
-        {   trigger       => 'wikipedia\s+(.*?)',
+        {   regex       => 'wikipedia\s+(.*?)',
             plugin        => "Wikipedia",
             plugin_method => "search"
         }
