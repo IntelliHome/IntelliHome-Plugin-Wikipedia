@@ -46,7 +46,7 @@ sub search {
     }
     if ($Output) {
         $Output = $hs->parse( $Output );
-        $Output =~ s/\n//g;
+        $Output =~ s/\n/ /g;
         local $/;
         $Output =~ s/\{.*?\}|\[.*?\]|\(.*?\)/ /g;
         $Output =~ s/\{|\}|\[|\]/ /g;
