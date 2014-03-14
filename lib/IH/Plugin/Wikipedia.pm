@@ -7,7 +7,8 @@ use Moose;
 use IH::Schema::Mongo::Trigger;
 use WWW::Google::AutoSuggest;
 use WWW::Wikipedia;
-
+use Encode;
+use HTML::Strip;
 extends 'IH::Plugin::Base';
 
 sub search {
@@ -17,14 +18,19 @@ sub search {
     my $Wikipedia = WWW::Wikipedia->new(
         language => $self->Config->DBConfiguration->{'language'} );
     my $result = $Wikipedia->search($Phrase);
+    my $hs     = HTML::Strip->new();
+    my $Output;
     if ( $result->text ) {
-        $self->Parser->Output->info( $result->text );    #needs strip
+
+        $Output = $result->text;
+
     }
     else {
         my $Suggest = WWW::Google::AutoSuggest->new();
-        $result = $Wikipedia->search( @{$Suggest->search($Phrase)}[0] );
+        $result = $Wikipedia->search( @{ $Suggest->search($Phrase) }[0] );
+        my $Output;
         if ( $result->text ) {
-            $self->Parser->Output->info( $result->text );    #needs strip
+            $Output = $result->text;
         }
         else {
             $Wikipedia->search(
@@ -32,10 +38,22 @@ sub search {
                     map { $_ = uc( substr( $_, 0, 1 ) ) . substr( $_, 1 ) }
                         @{ $Said->result } )
             );
-            $self->Parser->Output->info( $result->text ) if ( $result->text );
+            $Output = $result->text    #needs strip
+                if ( $result->text );
 
         }
 
+    }
+    if ($Output) {
+        $Output = $hs->parse( $Output );
+        $Output =~ s/\n//g;
+        local $/;
+        $Output =~ s/\{.*?\}|\[.*?\]|\(.*?\)/ /g;
+        $Output =~ s/\{|\}|\[|\]/ /g;
+        my @Speech = $Output =~ m/(.{1,150}\W)/gs;
+        $self->Parser->Output->info( join( " ", @Speech ) );
+        $self->Parser->Output->debug( join( " ", @Speech ) );
+        $hs->eof;
     }
 
 }
@@ -43,7 +61,7 @@ sub search {
 sub install {
     my $self = shift;
     $self->Parser->Backend->installPlugin(
-        {   regex       => 'wikipedia\s+(.*?)',
+        {   regex         => 'wikipedia\s+(.*)',
             plugin        => "Wikipedia",
             plugin_method => "search"
         }
@@ -54,7 +72,7 @@ sub install {
 sub remove {
     my $self = shift;
     $self->Parser->Backend->removePlugin(
-        {   regex       => 'wikipedia\s+(.*?)',
+        {   regex         => 'wikipedia\s+(.*)',
             plugin        => "Wikipedia",
             plugin_method => "search"
         }
