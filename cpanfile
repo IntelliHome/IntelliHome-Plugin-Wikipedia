@@ -1,5 +1,6 @@
+requires 'Encode';
+requires 'HTML::Strip';
 requires 'IH::Plugin::Base';
-requires 'IH::Schema::Mongo::Trigger';
 requires 'Moose';
 requires 'WWW::Google::AutoSuggest';
 requires 'WWW::Wikipedia';
