@@ -1,6 +1,5 @@
 package IH::Plugin::Wikipedia;
 
-
 =encoding utf-8
 
 =head1 NAME
@@ -32,6 +31,8 @@ Install the plugin into the mongo Database
 =item remove
 Remove the plugin triggers from the mongo Database
 
+=back 
+
 =head1 AUTHOR
 
 mudler E<lt>mudler@dark-lab.netE<gt>
@@ -49,7 +50,6 @@ it under the same terms as Perl itself.
 L<WWW::Wikipedia>, L<WWW::Google::AutoSuggest>
 
 =cut
-
 
 use strict;
 use 5.008_005;
@@ -70,7 +70,7 @@ sub search {
     my $result = $Wikipedia->search($Phrase);
     my $hs     = HTML::Strip->new();
     my $Output;
-    if ( $result->text ) {
+    if ($result) {
 
         $Output = $result->text;
 
@@ -78,28 +78,27 @@ sub search {
     else {
         my $Suggest = WWW::Google::AutoSuggest->new();
         $result = $Wikipedia->search( @{ $Suggest->search($Phrase) }[0] );
-        my $Output;
         if ( $result->text ) {
             $Output = $result->text;
         }
         else {
-            $Wikipedia->search(
+            $result = $Wikipedia->search(
                 join( " ",
                     map { $_ = uc( substr( $_, 0, 1 ) ) . substr( $_, 1 ) }
                         @{ $Said->result } )
             );
             $Output = $result->text    #needs strip
-                if ( $result->text );
+                if ($result);
 
         }
 
     }
     if ($Output) {
         $Output = $hs->parse($Output);
-        $Output =~ s/\n/ /g;
-        local $/;
+        $Output =~ tr {\n} { };
         $Output =~ s/\{.*?\}|\[.*?\]|\(.*?\)/ /g;
         $Output =~ s/\{|\}|\[|\]/ /g;
+        local $/;
         my @Speech = $Output =~ m/(.{1,150}\W)/gs;
         $self->Parser->Output->info( join( " ", @Speech ) );
         $self->Parser->Output->debug( join( " ", @Speech ) );
