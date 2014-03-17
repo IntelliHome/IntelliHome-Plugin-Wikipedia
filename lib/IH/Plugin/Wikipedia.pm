@@ -53,18 +53,20 @@ L<WWW::Wikipedia>, L<WWW::Google::AutoSuggest>
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use Moose;
 use WWW::Google::AutoSuggest;
 use WWW::Wikipedia;
 use Encode;
 use HTML::Strip;
+use Regexp::Common qw/URI/;
+
 extends 'IH::Plugin::Base';
 
 sub search {
     my $self      = shift;
     my $Said      = shift;
-    my $Phrase    = join( " ", @{ $Said->result } );
+    my $Phrase    = join( " ", @{ $Said->result } ); 
     my $Wikipedia = WWW::Wikipedia->new(
         language => $self->Config->DBConfiguration->{'language'} );
     my $result = $Wikipedia->search($Phrase);
@@ -96,7 +98,8 @@ sub search {
     if ($Output) {
         $Output = $hs->parse($Output);
         $Output =~ tr {\n} { };
-        $Output =~ s/\{.*?\}|\[.*?\]|\(.*?\)/ /g;
+        $Output =~ s/\{.*?\}|\[.*?\]|$RE{URI}{HTTP}//g;
+        $Output =~ s/[\[|\[\[](.*?)[\]|\]\]]/$1/g;
         $Output =~ s/\{|\}|\[|\]/ /g;
         local $/;
         my @Speech = $Output =~ m/(.{1,150}\W)/gs;
@@ -109,24 +112,29 @@ sub search {
 
 sub install {
     my $self = shift;
+
+    ############## MONGODB ##############
     $self->Parser->Backend->installPlugin(
-        {   regex         => 'wikipedia\s+(.*)',
+        {   regex         => 'wikipedia\s+(.*)', #We have one global match here 
             plugin        => "Wikipedia",
             plugin_method => "search"
         }
     ) if $self->Parser->Backend->isa("IH::Parser::DB::Mongo");
-
+    #####################################
 }
 
 sub remove {
     my $self = shift;
+
+    ############## MONGODB ##############
     $self->Parser->Backend->removePlugin(
-        {   regex         => 'wikipedia\s+(.*)',
+        {
             plugin        => "Wikipedia",
-            plugin_method => "search"
         }
     ) if $self->Parser->Backend->isa("IH::Parser::DB::Mongo");
+    #####################################
 }
 
+###We don't define update because default behaviour: remove() and install() it's enough
 1;
 __END__
