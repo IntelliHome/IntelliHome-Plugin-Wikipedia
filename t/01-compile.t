@@ -2,6 +2,6 @@ use strict;
 use Test::More;
 
 # replace with the actual test
-use_ok("IH::Plugin::Wikipedia");
+use_ok("IntelliHome::Plugin::Wikipedia");
 
 done_testing;

@@ -1,10 +1,10 @@
-package IH::Plugin::Wikipedia;
+package IntelliHome::Plugin::Wikipedia;
 
 =encoding utf-8
 
 =head1 NAME
 
-IH::Plugin::Wikipedia - Wikipedia plugin for Google@Home
+IntelliHome::Plugin::Wikipedia - Wikipedia plugin for Google@Home
 
 =head1 SYNOPSIS
 
@@ -13,7 +13,7 @@ IH::Plugin::Wikipedia - Wikipedia plugin for Google@Home
 
 =head1 DESCRIPTION
 
-IH::Plugin::Wikipedia is a wikipedia plugin that enables searches on wikipedia by calling "Wikipedia <term>" on the interfaces supported by Google@Home
+IntelliHome::Plugin::Wikipedia is a wikipedia plugin that enables searches on wikipedia by calling "Wikipedia <term>" on the interfaces supported by Google@Home
 
 =head1 METHODS
 
@@ -61,7 +61,7 @@ use Encode;
 use HTML::Strip;
 use Regexp::Common qw/URI/;
 
-extends 'IH::Plugin::Base';
+extends 'IntelliHome::Plugin::Base';
 
 sub search {
     my $self      = shift;
@@ -119,7 +119,7 @@ sub install {
             plugin        => "Wikipedia",
             plugin_method => "search"
         }
-    ) if $self->Parser->Backend->isa("IH::Parser::DB::Mongo");
+    ) if $self->Parser->Backend->isa("IntelliHome::Parser::DB::Mongo");
     #####################################
 }
 
@@ -131,7 +131,7 @@ sub remove {
         {
             plugin        => "Wikipedia",
         }
-    ) if $self->Parser->Backend->isa("IH::Parser::DB::Mongo");
+    ) if $self->Parser->Backend->isa("IntelliHome::Parser::DB::Mongo");
     #####################################
 }
 

@@ -1,6 +1,6 @@
 # NAME
 
-IH::Plugin::Wikipedia - Wikipedia plugin for Google@Home
+IntelliHome::Plugin::Wikipedia - Wikipedia plugin for Google@Home
 
 
 # SYNOPSIS
@@ -10,7 +10,7 @@ IH::Plugin::Wikipedia - Wikipedia plugin for Google@Home
 
 # DESCRIPTION
 
-IH::Plugin::Wikipedia is a wikipedia plugin that enables searches on wikipedia by calling "Wikipedia <term>" on the interfaces supported by Google@Home
+IntelliHome::Plugin::Wikipedia is a wikipedia plugin that enables searches on wikipedia by calling "Wikipedia <term>" on the interfaces supported by Google@Home
 
 ## METHODS
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "Wikipedia plugin for Google@Home",
    "author" : [
       "mudler <mudler@dark-lab.net>"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "IH-Plugin-Wikipedia",
+   "name" : "IntelliHome-Plugin-Wikipedia",
    "no_index" : {
       "directory" : [
          "t",
