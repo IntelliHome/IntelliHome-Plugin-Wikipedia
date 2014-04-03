@@ -79,8 +79,9 @@ sub search {
     }
     else {
         my $Suggest = WWW::Google::AutoSuggest->new();
-        $result = $Wikipedia->search( @{ $Suggest->search($Phrase) }[0] );
-        if ( $result->text ) {
+        my @results=$Suggest->search($Phrase);
+        $result = $Wikipedia->search( $results[0] ) if $results[0]; 
+        if ( defined $result and $result->text ) {
             $Output = $result->text;
         }
         else {
