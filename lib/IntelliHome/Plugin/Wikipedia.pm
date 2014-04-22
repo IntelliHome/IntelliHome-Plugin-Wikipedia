@@ -31,7 +31,7 @@ Install the plugin into the mongo Database
 =item remove
 Remove the plugin triggers from the mongo Database
 
-=back 
+=back
 
 =head1 AUTHOR
 
@@ -53,7 +53,7 @@ L<WWW::Wikipedia>, L<WWW::Google::AutoSuggest>
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Moose;
 use WWW::Google::AutoSuggest;
 use WWW::Wikipedia;
@@ -66,7 +66,7 @@ extends 'IntelliHome::Plugin::Base';
 sub search {
     my $self      = shift;
     my $Said      = shift;
-    my $Phrase    = join( " ", @{ $Said->result } ); 
+    my $Phrase    = join( " ", @{ $Said->result } );
     my $Wikipedia = WWW::Wikipedia->new(
         language => $self->Config->DBConfiguration->{'language'} );
     my $result = $Wikipedia->search($Phrase);
@@ -79,8 +79,8 @@ sub search {
     }
     else {
         my $Suggest = WWW::Google::AutoSuggest->new();
-        my @results=$Suggest->search($Phrase);
-        $result = $Wikipedia->search( $results[0] ) if $results[0]; 
+        my @results = $Suggest->search($Phrase);
+        $result = $Wikipedia->search( $results[0] ) if $results[0];
         if ( defined $result and $result->text ) {
             $Output = $result->text;
         }
@@ -107,6 +107,12 @@ sub search {
         $self->Parser->Output->info( join( " ", @Speech ) );
         $self->Parser->Output->debug( join( " ", @Speech ) );
         $hs->eof;
+        return
+            join( " ", @Speech )
+            ; # You have to return a result, otherwise your plugin will be marked as unsatisfied
+    }
+    else {
+        return undef;    #unsatisfied request, go on then
     }
 
 }
@@ -116,8 +122,8 @@ sub install {
 
     ############## MONGODB ##############
     $self->Parser->Backend->installPlugin(
-        {   regex         => 'wikipedia\s+(.*)', #We have one global match here 
-            plugin        => "Wikipedia",
+        {   regex  => 'wikipedia\s+(.*)',    #We have one global match here
+            plugin => "Wikipedia",
             plugin_method => "search"
         }
     ) if $self->Parser->Backend->isa("IntelliHome::Parser::DB::Mongo");
@@ -128,11 +134,8 @@ sub remove {
     my $self = shift;
 
     ############## MONGODB ##############
-    $self->Parser->Backend->removePlugin(
-        {
-            plugin        => "Wikipedia",
-        }
-    ) if $self->Parser->Backend->isa("IntelliHome::Parser::DB::Mongo");
+    $self->Parser->Backend->removePlugin( { plugin => "Wikipedia", } )
+        if $self->Parser->Backend->isa("IntelliHome::Parser::DB::Mongo");
     #####################################
 }
 
