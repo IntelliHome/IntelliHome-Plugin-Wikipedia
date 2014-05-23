@@ -104,8 +104,8 @@ sub search {
         $Output =~ s/\{|\}|\[|\]/ /g;
         local $/;
         my @Speech = $Output =~ m/(.{1,150}\W)/gs;
-        $self->Parser->Output->info( join( " ", @Speech ) );
-        $self->Parser->Output->debug( join( " ", @Speech ) );
+        $self->IntelliHome->Output->info( join( " ", @Speech ) );
+        $self->IntelliHome->Output->debug( join( " ", @Speech ) );
         $hs->eof;
         return
             join( " ", @Speech )
@@ -134,8 +134,8 @@ sub remove {
     my $self = shift;
 
     ############## MONGODB ##############
-    $self->Parser->Backend->removePlugin( { plugin => "Wikipedia", } )
-        if $self->Parser->Backend->isa("IntelliHome::Parser::DB::Mongo");
+    $self->IntelliHome->Backend->removePlugin( { plugin => "Wikipedia", } )
+        if $self->IntelliHome->Backend->isa("IntelliHome::Parser::DB::Mongo");
     #####################################
 }
 
